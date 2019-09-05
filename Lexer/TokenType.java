@@ -9,5 +9,10 @@ public enum TokenType {
     MULTIPLY,
     DIVIDE,
     OPEN_BRACKET,
-    CLOSE_BRACKET
+    CLOSE_BRACKET,
+    BEGIN,
+    END,
+    ID,
+    ASSIGN,SEMI,
+    DOT
 }
