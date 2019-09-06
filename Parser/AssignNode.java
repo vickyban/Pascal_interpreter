@@ -8,6 +8,7 @@ public class AssignNode extends Node {
     public Node right;
     public AssignNode(Node left, Token op, Node right){
         this.token = op;
+        this.op = op;
         this.left = left;
         this.right = right;
     }

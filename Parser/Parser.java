@@ -87,9 +87,8 @@ public class Parser {
     }
 
     public Node parse() throws Exception {
-
         Node node = program();
-        if(node.token.type != TokenType.EOF)
+        if(curToken.type != TokenType.EOF)
             throw new Exception("Should be EOF but not");
         return node;
     }
