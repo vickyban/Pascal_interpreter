@@ -10,4 +10,5 @@ public abstract class Node {
     public Node(Token token){
         this.token = token;
     }
+    public Node(){}
 }

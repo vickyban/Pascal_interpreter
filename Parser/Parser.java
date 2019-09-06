@@ -4,6 +4,8 @@ import Lexer.Lexer;
 import Lexer.Token;
 import Lexer.TokenType;
 
+import java.util.ArrayList;
+
 /**
  * parse tokens into a tree structure
  */
@@ -16,6 +18,16 @@ public class Parser {
         curToken = lexer.getNextToken();
     }
 
+    /**
+     * factor:
+     * PLUS factor  |
+     * MINUS factor |
+     * INTEGER |
+     * LPAREN expr RPAREN |
+     * variable
+     * @return
+     * @throws Exception
+     */
     public Node factor() throws Exception {
         // return NumNode
         Token token = curToken;
@@ -33,8 +45,9 @@ public class Parser {
         }else if(curToken.type == TokenType.MINUS){
             eat(TokenType.MINUS);
             return new UnaryNode(token, factor());
+        }else{
+            return variable();
         }
-        throw new Exception("Invalid factor value: " + curToken.value);
     }
 
     public void eat(TokenType type) throws Exception {
@@ -74,6 +87,95 @@ public class Parser {
     }
 
     public Node parse() throws Exception {
-        return expr();
+
+        Node node = program();
+        if(node.token.type != TokenType.EOF)
+            throw new Exception("Should be EOF but not");
+        return node;
     }
+
+    /**
+     * program: compound_statement DOT
+     * @return
+     * @throws Exception
+     */
+    public Node program() throws Exception {
+        Node node = compound_statement();
+        eat(TokenType.DOT);
+        return node;
+    }
+
+    /**
+     * compount_statement: BEGIN statement_list END
+     * @return
+     */
+    public Node compound_statement() throws Exception {
+        eat(TokenType.BEGIN);
+        ArrayList<Node> nodes = statement_list();
+        eat(TokenType.END);
+
+        CompoundNode root = new CompoundNode();
+        for(Node child : nodes){
+             root.children.add(child);
+        }
+        return root;
+    }
+
+    /**
+     * statement_list: statement | statement SEMI statement_list
+     * @return
+     */
+    public ArrayList<Node> statement_list() throws Exception {
+        Node node = statement();
+        ArrayList<Node> nodes = new ArrayList<>();
+        nodes.add(node);
+        while(curToken.type == TokenType.SEMI){
+            eat(TokenType.SEMI);
+            nodes.add(statement());
+        }
+        if(curToken.type == TokenType.ID)
+            throw new Exception("Invalid statement");
+        return nodes;
+    }
+
+    /**
+     * statement: compound_statement | assignment_statement | empty
+     * @return
+     */
+    public Node statement() throws Exception {
+        if(curToken.type == TokenType.BEGIN){
+            return compound_statement();
+        }else if(curToken.type == TokenType.ID){
+            return assignment_statement();
+        }else
+            return empty();
+    }
+
+    public Node empty() {
+        return new NoOp();
+    }
+
+    /**
+     * assignment statement: variable Assign expr
+     * @return
+     */
+    public Node assignment_statement() throws Exception {
+        Node left = variable();
+        Token op = curToken;
+        eat(TokenType.ASSIGN);
+        Node right = expr();
+        return new AssignNode(left, op, right);
+    }
+
+    /**
+     * varibale : ID
+     * @return
+     */
+    private Node variable() throws Exception {
+        Node var = new VariableNode(curToken);
+        eat(TokenType.ID);
+        return var;
+    }
+
+
 }
