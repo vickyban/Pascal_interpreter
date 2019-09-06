@@ -11,7 +11,7 @@ import java.util.HashMap;
  * will use Visitor pattern to visit/traverse AST node
  */
 public class Interpreter {
-    public HashMap<String,Integer> GLOBAL_SCOPE = new HashMap<>();
+    public HashMap<String,Double> GLOBAL_SCOPE = new HashMap<>();
     private Parser parser;
     private Node root;
     public Interpreter(Parser parser) throws Exception {
@@ -19,13 +19,14 @@ public class Interpreter {
         root= parser.parse();
     }
 
-    public int interpreter(){
+    public double interpreter(){
         return visit(root);
     }
 
-    public int visit(Node node){
-        if(node instanceof NumNode)
-            return visit_NumNode((NumNode) node);
+    public double visit(Node node){
+        if(node instanceof NumNode){
+            return visit_Float((NumNode) node);
+        }
         else if(node instanceof BinOpNode)
             return visit_BinOpNode((BinOpNode) node);
         else if(node instanceof UnaryNode)
@@ -36,28 +37,38 @@ public class Interpreter {
             visit_Compound((CompoundNode) node);
         else if(node instanceof AssignNode )
             visit_Assign((AssignNode) node);
+        else if(node instanceof VarDeclNode )
+            visit_VarDecl((VarDeclNode) node);
+        else if(node instanceof TypeNode )
+            visit_Type((TypeNode) node);
+        else if(node instanceof ProgramNode )
+            visit_Program((ProgramNode) node);
+        else if(node instanceof BlockNode )
+            visit_Block((BlockNode) node);
         return 0;
     }
 
-    private int visit_Unary(UnaryNode node) {
+    private double visit_Unary(UnaryNode node) {
         if(node.op.type == TokenType.PLUS)
             return +visit(node.expr);
         else
             return -visit(node.expr);
     }
 
-    public int visit_NumNode(NumNode node){
-        return node.value;
+    public double visit_Float(NumNode node){
+        return node.token.getDoubleValue();
     }
 
-    public int visit_BinOpNode(BinOpNode node){
+    public double visit_BinOpNode(BinOpNode node){
         if(node.op.type == TokenType.PLUS)
             return visit(node.left) + visit(node.right);
         else if(node.op.type == TokenType.MINUS)
             return visit(node.left) - visit(node.right);
         else if(node.op.type == TokenType.MULTIPLY)
             return visit(node.left) * visit(node.right);
-        else if(node.op.type == TokenType.DIVIDE)
+        else if(node.op.type == TokenType.INTEGER_DIV)
+            return (int)visit(node.left) / (int)visit(node.right);
+        else if(node.op.type == TokenType.FLOAT_DIV)
             return visit(node.left) / visit(node.right);
         return 0;
     }
@@ -72,11 +83,24 @@ public class Interpreter {
         GLOBAL_SCOPE.put(var, visit(node.right));
     }
 
-    public int visit_Var(VariableNode node){
+    public double visit_Var(VariableNode node){
         return GLOBAL_SCOPE.get(node.token.value);
     }
 
     public void visit_NoOp(){
+    }
+    public void visit_Program(ProgramNode node){
+        visit(node.block);
+    }
+    public void visit_Block(BlockNode node){
+        for(VarDeclNode dec : node.declarations)
+            visit(dec);
+        visit(node.compoundNode);
+    }
+    public void visit_VarDecl(VarDeclNode node){
+
+    }
+    public void visit_Type(TypeNode node){
 
     }
 }

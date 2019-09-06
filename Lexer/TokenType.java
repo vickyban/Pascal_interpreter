@@ -14,5 +14,15 @@ public enum TokenType {
     END,
     ID,
     ASSIGN,SEMI,
-    DOT
+    DOT,
+    COLON,
+    COMMA,
+    PROGRAM,
+    REAL,
+    INTEGER_CONST,
+    INTEGER_DIV,
+    REAL_CONST,
+    FLOAT_DIV,
+    VAR
+
 }

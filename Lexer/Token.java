@@ -12,4 +12,7 @@ public class Token {
     public int getIntValue(){
         return Integer.parseInt(value);
     }
+    public double getDoubleValue(){
+        return Double.parseDouble(value);
+    }
 }
