@@ -14,6 +14,7 @@ public class Lexer {
         put("DIV", new Token(TokenType.INTEGER_DIV, "DIV"));
         put("INTEGER", new Token(TokenType.INTEGER, "INTEGER"));
         put("REAL", new Token(TokenType.REAL, "REAL"));
+        put("PROCEDURE", new Token(TokenType.PROCEDURE, "PROCEDURE"));
     }};
     private String text;
     private char curChar;

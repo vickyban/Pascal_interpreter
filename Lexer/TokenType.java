@@ -23,6 +23,7 @@ public enum TokenType {
     INTEGER_DIV,
     REAL_CONST,
     FLOAT_DIV,
-    VAR
+    VAR,
+    PROCEDURE
 
 }

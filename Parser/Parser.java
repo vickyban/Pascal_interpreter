@@ -181,18 +181,18 @@ public class Parser {
      * block : declarations compound_statement
      */
     public BlockNode block() throws Exception {
-        List<VarDeclNode> declarations = declarations();
+        List<Node> declarations = declarations();
         CompoundNode compoundStatement = compound_statement();
         BlockNode node = new BlockNode(declarations,compoundStatement);
         return node;
     }
 
     /**
-     * declarations : VAR(var_declaration SEMI)+ | empty
+     * declarations : VAR(var_declaration SEMI)+ | (PROCEDURE ID (LPAREN formal_param_list RPAREN )? SEMI block SEMI)* | empty
      * @return
      */
-    private List<VarDeclNode> declarations() throws Exception {
-        List<VarDeclNode> declarations = new ArrayList<VarDeclNode>();
+    private List<Node> declarations() throws Exception {
+        List<Node> declarations = new ArrayList<>();
         if(curToken.type == TokenType.VAR){
             eat(TokenType.VAR);
             while(curToken.type == TokenType.ID){
@@ -201,7 +201,30 @@ public class Parser {
                 eat(TokenType.SEMI);
             }
         }
+        while(curToken.type == TokenType.PROCEDURE){
+            eat(TokenType.PROCEDURE);
+            String procName = curToken.value;
+            eat(TokenType.ID);
+            eat(TokenType.SEMI);
+            BlockNode block = block();
+            ProcedureDeclNode procNode = new ProcedureDeclNode(procName,block);
+            declarations.add(procNode);
+            eat(TokenType.SEMI);
+        }
         return declarations;
+    }
+
+    /**
+     * formal_params : ID (COMMA ID)* COLON type_spec
+     * @return
+     */
+    public List<ParamNode> formalParameters() throws Exception {
+        List<ParamNode> paramNodes = new ArrayList<>();
+        if(curToken.type == TokenType.OPEN_BRACKET){
+            eat(TokenType.OPEN_BRACKET);
+
+            eat(TokenType.CLOSE_BRACKET);
+        }
     }
 
     /**

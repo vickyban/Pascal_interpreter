@@ -45,6 +45,8 @@ public class Interpreter {
             visit_Program((ProgramNode) node);
         else if(node instanceof BlockNode )
             visit_Block((BlockNode) node);
+        else if(node instanceof ProcedureDeclNode )
+            visit_ProdcedureDecl((ProcedureDeclNode) node);
         return 0;
     }
 
@@ -93,7 +95,7 @@ public class Interpreter {
         visit(node.block);
     }
     public void visit_Block(BlockNode node){
-        for(VarDeclNode dec : node.declarations)
+        for(Node dec : node.declarations)
             visit(dec);
         visit(node.compoundNode);
     }
@@ -101,6 +103,9 @@ public class Interpreter {
 
     }
     public void visit_Type(TypeNode node){
+
+    }
+    public void visit_ProdcedureDecl(ProcedureDeclNode node){
 
     }
 }

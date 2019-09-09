@@ -1,6 +1,8 @@
 import Interpreter.Interpreter;
 import Lexer.Lexer;
 import Parser.Parser;
+import symbol.BuiltinTypeSymbol;
+import symbol.VarSymbol;
 
 public class Test {
     public static void main(String[] args){
@@ -27,11 +29,15 @@ public class Test {
         Parser p = new Parser(l);
         try {
             Interpreter i = new Interpreter(p);
-            i.interpreter();
-            System.out.println(i.GLOBAL_SCOPE);
+            //i.interpreter();
+            //System.out.println(i.GLOBAL_SCOPE);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
+        BuiltinTypeSymbol intType = new BuiltinTypeSymbol("INTEGER");
+        System.out.println(intType);
+        VarSymbol x = new VarSymbol("x",intType);
+        System.out.println(x);
     }
 }
