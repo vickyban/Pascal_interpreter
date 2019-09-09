@@ -56,7 +56,8 @@ public class SemanticAnalyzer {
         System.out.println("ENTER scope " + procName);
 
         // scope for parameters and local variable
-        ScopeSymbolTable procedureScope = new ScopeSymbolTable(procName,2, curScope);
+        // use current_scope to find out the scope level of the nesting scope
+        ScopeSymbolTable procedureScope = new ScopeSymbolTable(procName,curScope.scopeLevel + 1, curScope);
         curScope = procedureScope;
         for(ParamNode param : node.params){
             Symbol paramType = curScope.lookup(param.typeNode.value);
@@ -98,7 +99,7 @@ public class SemanticAnalyzer {
 
         // Check of the var is declared twice or more
         if(curScope.lookup(varName) != null)
-            throw new Exception("Error: Duplicate identifier " + va rName + " found");
+            throw new Exception("Error: Duplicate identifier " + varName + " found");
         curScope.define(varSymbol);
     }
 

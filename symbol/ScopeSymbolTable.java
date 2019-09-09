@@ -40,7 +40,12 @@ public class ScopeSymbolTable {
     public Symbol lookup(String name){
         System.out.println("Lookup " + name);
         Symbol symbol = symbols.get(name);
-        return symbol;
+        if(symbol != null)
+            return symbol;
+        // recursively go up the chain and lookup the name
+        if(enclosingScope != null)
+            return enclosingScope.lookup(name);
+        return null;
     }
 
     public String toString(){
