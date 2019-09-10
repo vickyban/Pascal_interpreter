@@ -205,9 +205,10 @@ public class Parser {
             eat(TokenType.PROCEDURE);
             String procName = curToken.value;
             eat(TokenType.ID);
+            List<ParamNode> params = formalParameters();
             eat(TokenType.SEMI);
             BlockNode block = block();
-            ProcedureDeclNode procNode = new ProcedureDeclNode(procName,block);
+            ProcedureDeclNode procNode = new ProcedureDeclNode(procName,params,block);
             declarations.add(procNode);
             eat(TokenType.SEMI);
         }
@@ -222,9 +223,18 @@ public class Parser {
         List<ParamNode> paramNodes = new ArrayList<>();
         if(curToken.type == TokenType.OPEN_BRACKET){
             eat(TokenType.OPEN_BRACKET);
-
+            List<VarDeclNode>results = new ArrayList<>();
+            results.addAll(variableDeclaration());
+            while(curToken.type == TokenType.SEMI){
+                eat(TokenType.SEMI);
+                results.addAll(variableDeclaration());
+            }
+            for(VarDeclNode d : results){
+                paramNodes.add(new ParamNode(d.var,d.varType));
+            }
             eat(TokenType.CLOSE_BRACKET);
         }
+        return paramNodes;
     }
 
     /**

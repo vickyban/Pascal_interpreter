@@ -99,6 +99,8 @@ public class Lexer {
         index++;
         if(index < text.length()){
             curChar = text.charAt(index);
+        }else{
+            curChar = '\u0000';
         }
     }
 

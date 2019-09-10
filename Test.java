@@ -1,6 +1,7 @@
 import Interpreter.Interpreter;
 import Lexer.Lexer;
-import Parser.Parser;
+import Parser.*;
+import sourceToSourceCompiler.SourceToSourceCompiler;
 import symbol.BuiltinTypeSymbol;
 import symbol.VarSymbol;
 
@@ -8,36 +9,39 @@ public class Test {
     public static void main(String[] args){
         String text =
                 "PROGRAM part10; " +
-                "VAR " +
-                        "num : INTEGER;" +
-                        "a,b,c,x : INTEGER; " +
-                        "y : REAL; "+
-                "BEGIN {part 10}" +
-                        "BEGIN " +
-                        "   num := 2;" +
-                        "   a := num;" +
-                        "   b := 10 * a + 10 * num DIV 4;" +
-                        "   c := a --b;" +
-                        "END; " +
-                        "x := 11; " +
-                        "y := 20 / 7 + 3.14 " +
-                        "{ comment a } " +
-                        "{ comment b } " +
-                        "{ comment c } " +
-                "END.";
+                    "VAR " +
+                            "x,y : REAL;" +
+                            "z : INTEGER; " +
+                    "PROCEDURE AlphaA(a:INTEGER); "+
+                        "VAR y : INTEGER; "+
+                        "BEGIN {AlphaA} " +
+                                "x := a + x + y; "+
+                        "END; "+
+                    "PROCEDURE AlphaB(a:INTEGER); "+
+                        "VAR b : INTEGER; "+
+                        "BEGIN {AlphaB} " +
+                        "END; "+
+                "BEGIN " +
+
+                "END. ";
+
         Lexer l = new Lexer(text);
         Parser p = new Parser(l);
         try {
-            Interpreter i = new Interpreter(p);
+            Node n = p.parse();
+            //Interpreter i = new Interpreter(p);
             //i.interpreter();
             //System.out.println(i.GLOBAL_SCOPE);
+            SourceToSourceCompiler compiler = new SourceToSourceCompiler();
+            compiler.visit(n);
+            System.out.println(compiler.output);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        BuiltinTypeSymbol intType = new BuiltinTypeSymbol("INTEGER");
-        System.out.println(intType);
-        VarSymbol x = new VarSymbol("x",intType);
-        System.out.println(x);
+//        BuiltinTypeSymbol intType = new BuiltinTypeSymbol("INTEGER");
+//        System.out.println(intType);
+//        VarSymbol x = new VarSymbol("x",intType);
+//        System.out.println(x);
     }
 }

@@ -18,6 +18,6 @@ public class Symbol {
     }
 
     public String toString(){
-        return getClass() + "_" + name;
+        return name;
     }
 }

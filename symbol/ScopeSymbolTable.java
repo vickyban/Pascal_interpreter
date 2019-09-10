@@ -12,24 +12,24 @@ public class ScopeSymbolTable {
     public HashMap<String, Symbol> symbols = new HashMap<>();
 
     public ScopeSymbolTable(){
-        init();
     }
 
     public ScopeSymbolTable(String scopeName, int scopeLevel,ScopeSymbolTable enclosingScope){
-        this();
         this.scopeName = scopeName;
         this.scopeLevel = scopeLevel;
         this.enclosingScope = enclosingScope;
     }
 
     public void init(){
-        define(new BuiltinTypeSymbol("INTEGER"));
-        define(new BuiltinTypeSymbol("REAL"));
+        symbols.put("INTEGER",new BuiltinTypeSymbol("INTEGER"));
+        symbols.put("REAL",new BuiltinTypeSymbol("REAL"));
     }
 
     public void define(Symbol symbol){
+        String name = symbol.name;
+        symbol.name = name + scopeLevel;
         System.out.println("Define "+ symbol);
-        symbols.put(symbol.name, symbol);
+        symbols.put(name, symbol);
     }
 
     /**
