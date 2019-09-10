@@ -8,11 +8,11 @@ import symbol.VarSymbol;
 public class Test {
     public static void main(String[] args){
         String text =
-                "PROGRAM part10; " +
-                    "VAR " +
-                            "x,y : REAL;" +
-                            "z : INTEGER; " +
-                    "PROCEDURE AlphaA(a:INTEGER); "+
+                "PROGRAM part10; \n" +
+                    "VAR \n" +
+                            "x,y : REAL;\n" +
+                            "z : INTEGER;\n " +
+                    "PROCEDURE AlphaA(a:INTEGER) "+
                         "VAR y : INTEGER; "+
                         "BEGIN {AlphaA} " +
                                 "x := a + x + y; "+
@@ -26,8 +26,8 @@ public class Test {
                 "END. ";
 
         Lexer l = new Lexer(text);
-        Parser p = new Parser(l);
         try {
+            Parser p = new Parser(l);
             Node n = p.parse();
             //Interpreter i = new Interpreter(p);
             //i.interpreter();

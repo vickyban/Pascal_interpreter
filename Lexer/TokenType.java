@@ -1,29 +1,37 @@
 package Lexer;
 
 public enum TokenType {
-    NONE,
-    EOF,
-    INTEGER,
-    PLUS,
-    MINUS,
-    MULTIPLY,
-    DIVIDE,
-    OPEN_BRACKET,
-    CLOSE_BRACKET,
-    BEGIN,
-    END,
-    ID,
-    ASSIGN,SEMI,
-    DOT,
-    COLON,
-    COMMA,
-    PROGRAM,
-    REAL,
-    INTEGER_CONST,
-    INTEGER_DIV,
-    REAL_CONST,
-    FLOAT_DIV,
-    VAR,
-    PROCEDURE
+    NONE(null),
+    EOF("EOF"),
+
+    PLUS("+"),
+    MINUS("-"),
+    MULTIPLY("*"),
+    FLOAT_DIV("/"),
+    OPEN_BRACKET("("),
+    CLOSE_BRACKET(")"),
+    SEMI(";"),
+    DOT("."),
+    COLON(":"),
+    COMMA(","),
+
+    PROGRAM("PROGRAM"),
+    VAR("VAR"),
+    INTEGER("INTEGER"),
+    REAL("REAL"),
+    PROCEDURE("PROCEDURE"),
+    BEGIN("BEGIN"),
+    INTEGER_DIV("DIV"),
+    END("END"),
+
+    ID("ID"),
+    ASSIGN(":="),
+    INTEGER_CONST("INTEGER CONST"),
+    REAL_CONST("REAL CONST");
+
+    public String value;
+    TokenType(String value){
+        this.value = value;
+    }
 
 }

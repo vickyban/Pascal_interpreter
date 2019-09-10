@@ -1,6 +1,8 @@
 package sourceToSourceCompiler;
 
 import Parser.*;
+import exceptions.ErrorCode;
+import exceptions.SemanticError;
 import symbol.ScopeSymbolTable;
 import symbol.Symbol;
 import symbol.VarSymbol;
@@ -94,7 +96,7 @@ public class SourceToSourceCompiler {
         String varName = node.var.name;
         String type = node.varType.value;
         if(curScope.lookup(varName,true)!= null)
-            throw new Exception("ERROR: Duplicate identifier " + varName + " found");
+            throw new SemanticError(ErrorCode.DUPLICATED_ID, node.token,"Duplicate identifier " + varName + " found");
 
         Symbol symbolType = curScope.lookup(type);
         VarSymbol vaSymbol = new VarSymbol(varName, symbolType);
@@ -146,7 +148,7 @@ public class SourceToSourceCompiler {
         if(symbol != null)
             return symbol.toString();
         else
-            throw new Exception("ERROR: " + node.name + " is not found");
+            throw new SemanticError(ErrorCode.ID_NOT_FOUND, node.token, node.name + " is not found");
     }
 
     public String visit(BinOpNode node) throws Exception {

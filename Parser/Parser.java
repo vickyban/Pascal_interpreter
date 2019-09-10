@@ -3,6 +3,9 @@ package Parser;
 import Lexer.Lexer;
 import Lexer.Token;
 import Lexer.TokenType;
+import exceptions.ErrorCode;
+import exceptions.LexerError;
+import exceptions.ParserError;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +17,7 @@ public class Parser {
     private Lexer lexer;
     private Token curToken;
 
-    public Parser(Lexer lexer){
+    public Parser(Lexer lexer) throws LexerError {
         this.lexer = lexer;
         curToken = lexer.getNextToken();
     }
@@ -59,7 +62,7 @@ public class Parser {
         if(curToken.type == type){
             curToken = lexer.getNextToken();
         }else{
-            throw new Exception("Expected " + type + " token but receive " + curToken.type );
+            throw new ParserError(ErrorCode.UNEXPECTED_TOKEN, curToken,"Expected " + type + " token but receive " + curToken.type );
         }
     }
 
@@ -101,7 +104,7 @@ public class Parser {
     public Node parse() throws Exception {
         Node node = program();
         if(curToken.type != TokenType.EOF)
-            throw new Exception("Should be EOF but not");
+            throw new ParserError(ErrorCode.UNEXPECTED_TOKEN, curToken,"Should be EOF but not");
         return node;
     }
 
@@ -134,7 +137,7 @@ public class Parser {
             nodes.add(statement());
         }
         if(curToken.type == TokenType.ID)
-            throw new Exception("Invalid statement");
+            throw new ParserError(ErrorCode.UNEXPECTED_TOKEN, curToken, "");
         return nodes;
     }
 
@@ -258,8 +261,8 @@ public class Parser {
             declarations.add(new VarDeclNode(child,type));
         }
         return declarations;
-
     }
+
 
     /**
      * type_spec : INTEGER | REAL
@@ -286,5 +289,6 @@ public class Parser {
         eat(TokenType.DOT);
         return new ProgramNode(progName,blockNode);
     }
+
 
 }
