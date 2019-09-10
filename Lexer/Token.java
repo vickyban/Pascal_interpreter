@@ -3,6 +3,8 @@ package Lexer;
 public class Token {
     public String value;
     public TokenType type;
+    public int lineno;
+    public int column;
 
     public Token(TokenType type, String value){
         this.value = value;

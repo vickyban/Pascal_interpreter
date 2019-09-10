@@ -6,6 +6,7 @@ import symbol.Symbol;
 import symbol.VarSymbol;
 
 import java.awt.*;
+import java.security.spec.ECField;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -89,9 +90,12 @@ public class SourceToSourceCompiler {
         return resultStr;
     }
 
-    public String visit(VarDeclNode node){
+    public String visit(VarDeclNode node) throws Exception {
         String varName = node.var.name;
         String type = node.varType.value;
+        if(curScope.lookup(varName,true)!= null)
+            throw new Exception("ERROR: Duplicate identifier " + varName + " found");
+
         Symbol symbolType = curScope.lookup(type);
         VarSymbol vaSymbol = new VarSymbol(varName, symbolType);
 
