@@ -1,16 +1,20 @@
 package symbol;
 
+import Lexer.Token;
 import Parser.*;
+import exceptions.ErrorCode;
+import exceptions.SemanticError;
+import logger.Logger;
 
 /**
  * AST node visitor to build symbol table
  * AKA SemanticAnalyzer
  */
 public class SemanticAnalyzer {
+
     public ScopeSymbolTable curScope ;
     public SemanticAnalyzer(){
     }
-
 
     public void visit(Node node) throws Exception {
         if(node instanceof BinOpNode)
@@ -29,6 +33,13 @@ public class SemanticAnalyzer {
             visit_Program((ProgramNode) node);
         else if(node instanceof BlockNode )
             visit_Block((BlockNode) node);
+        else if(node instanceof ProcedureDeclNode )
+            visit_ProcedureDecl((ProcedureDeclNode) node);
+        else if(node instanceof ProcedureCall)
+            visit_ProcedureCall((ProcedureCall) node);
+        else if(node instanceof NumNode)
+            visit_Num((NumNode) node);
+
     }
 
     public void visit_Block(BlockNode node) throws Exception {
@@ -45,15 +56,15 @@ public class SemanticAnalyzer {
         // visit subtree
         visit(node.block);
 
-        System.out.println(globalScope);
-        System.out.println("LEAVE scope: global");
+        Logger.log(globalScope.toString());
+        Logger.log("LEAVE scope: global");
     }
     public void visit_ProcedureDecl(ProcedureDeclNode node) throws Exception {
         String procName = node.procName;
         ProcedureSymbol procSymbol = new ProcedureSymbol(procName);
         curScope.define(procSymbol);
 
-        System.out.println("ENTER scope " + procName);
+        Logger.log("ENTER scope " + procName);
 
         // scope for parameters and local variable
         // use current_scope to find out the scope level of the nesting scope
@@ -68,11 +79,11 @@ public class SemanticAnalyzer {
         }
         visit(node.block);
 
-        System.out.println(procedureScope);
+        Logger.log(procedureScope.toString());
         // return back to outer scope;
         curScope = curScope.enclosingScope;
 
-        System.out.println("LEAVE scope " + procName);
+        Logger.log("LEAVE scope " + procName);
     }
 
     public void visit_BinOpNode(BinOpNode node) throws Exception {
@@ -98,22 +109,43 @@ public class SemanticAnalyzer {
         VarSymbol varSymbol = new VarSymbol(varName,typeSymbol);
 
         // Check of the var is declared twice or more
-        if(curScope.lookup(varName) != null)
-            throw new Exception("Error: Duplicate identifier " + varName + " found");
+        if(curScope.lookup(varName,true) != null)
+            error(ErrorCode.DUPLICATED_ID,node.token);
         curScope.define(varSymbol);
     }
 
     public void visit_Var(VariableNode node) throws Exception {
         String varName = node.token.value;
         Symbol varSymbol =  curScope.lookup(varName);
-        if(varSymbol == null){
-            throw new Exception("Error: " + varName + " variable is not declared");
-        }
-
+        if(varSymbol == null)
+            error(ErrorCode.ID_NOT_FOUND, node.token);
     }
 
     public void visit_Assign(AssignNode node) throws Exception {
         visit(node.left);
         visit(node.right);
+    }
+
+    public void error(ErrorCode errCode, Token token) throws SemanticError {
+        throw new SemanticError(errCode, token, "");
+    }
+
+    public void visit_Num(NumNode node){
+
+    }
+
+    public void visit_ProcedureCall(ProcedureCall node) throws Exception {
+        Symbol symbol = curScope.lookup(node.procName);
+        if(symbol == null)
+            error(ErrorCode.ID_NOT_FOUND, node.token);
+
+        ProcedureSymbol procedureSymbol = (ProcedureSymbol) symbol;
+        // check if matching no. of args
+        if(procedureSymbol.params.size() != node.params.size())
+            error(ErrorCode.INVALID_NUM_ARG, node.token);
+
+        for(Node param : node.params){
+            visit(param);
+        }
     }
 }

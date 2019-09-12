@@ -1,5 +1,7 @@
 package symbol;
 
+import logger.Logger;
+
 import java.util.HashMap;
 
 /**
@@ -28,7 +30,7 @@ public class ScopeSymbolTable {
     public void define(Symbol symbol){
         String name = symbol.name;
         symbol.name = name + scopeLevel;
-        System.out.println("Define "+ symbol);
+        Logger.log("Define "+ symbol);
         symbols.put(name, symbol);
     }
 
@@ -42,7 +44,7 @@ public class ScopeSymbolTable {
     }
 
     public Symbol lookup(String name, boolean curScopeOnly){
-        System.out.println("Lookup " + name);
+        Logger.log("Lookup " + name);
         Symbol symbol = symbols.get(name);
         if(symbol != null)
             return symbol;

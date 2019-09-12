@@ -11,7 +11,7 @@ import java.util.HashMap;
 public class Lexer {
     private HashMap<String,Token> RESERVE_KEYWORD;
     private String text;
-    private char curChar;
+    public char curChar;
     private int index;
     private int lineno;
     private int column;

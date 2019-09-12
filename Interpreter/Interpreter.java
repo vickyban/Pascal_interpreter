@@ -2,8 +2,11 @@ package Interpreter;
 
 import Lexer.TokenType;
 import Parser.*;
+import logger.Logger;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * translate/execute AST
@@ -11,12 +14,17 @@ import java.util.HashMap;
  * will use Visitor pattern to visit/traverse AST node
  */
 public class Interpreter {
-    public HashMap<String,Double> GLOBAL_SCOPE = new HashMap<>();
-    private Parser parser;
+
+    public CallStack stack;
     private Node root;
-    public Interpreter(Parser parser) throws Exception {
-        this.parser = parser;
-        root= parser.parse();
+    private Logger log;
+
+    public Interpreter(Node root) throws Exception {
+        this.root= root;
+        this.stack = new CallStack();
+
+        log = new Logger();
+        log.shouldLogStack = true;
     }
 
     public double interpreter(){
@@ -47,6 +55,8 @@ public class Interpreter {
             visit_Block((BlockNode) node);
         else if(node instanceof ProcedureDeclNode )
             visit_ProdcedureDecl((ProcedureDeclNode) node);
+        else if(node instanceof ProcedureCall )
+            visit_ProdcedureCall((ProcedureCall) node);
         return 0;
     }
 
@@ -82,17 +92,30 @@ public class Interpreter {
 
     public void visit_Assign(AssignNode node){
         String var = node.left.token.value;
-        GLOBAL_SCOPE.put(var, visit(node.right));
+        stack.peek().setItem(var, visit(node.right));
     }
 
     public double visit_Var(VariableNode node){
-        return GLOBAL_SCOPE.get(node.token.value);
+        return stack.peek().getItem(node.token.value);
     }
 
     public void visit_NoOp(){
     }
+
     public void visit_Program(ProgramNode node){
+        String progName = node.progName.name;
+        ActivationRecord ar = new ActivationRecord(progName,ARType.PROGRAM,1);
+        stack.push(ar);
+
+        log.logStack("ENTER: PROGRAM " + progName);
+        log.logStack(stack.toString());
+
         visit(node.block);
+
+        log.logStack("LEAVE: PROGRAM " + progName);
+        log.logStack(stack.toString());
+
+         stack.pop();
     }
     public void visit_Block(BlockNode node){
         for(Node dec : node.declarations)
@@ -100,12 +123,24 @@ public class Interpreter {
         visit(node.compoundNode);
     }
     public void visit_VarDecl(VarDeclNode node){
-
+        stack.peek().setItem(node.var.name, 0.0);
     }
     public void visit_Type(TypeNode node){
 
     }
     public void visit_ProdcedureDecl(ProcedureDeclNode node){
 
+    }
+    public void visit_ProdcedureCall(ProcedureCall node){
+        List<Double> paramValues = new ArrayList<>();
+        for(Node param : node.params){
+            paramValues.add(visit(param));
+        }
+
+        ActivationRecord ar = new ActivationRecord(node.procName, ARType.PROCEDURE, stack.peek().nestingLevel + 1);
+        stack.push(ar);
+
+
+        stack.pop();
     }
 }

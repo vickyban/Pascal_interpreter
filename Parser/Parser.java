@@ -142,12 +142,18 @@ public class Parser {
     }
 
     /**
-     * statement: compound_statement | assignment_statement | empty
+     * statement:
+     * compound_statement |
+     * assignment_statement |
+     * procall_statement |
+     * empty
      * @return
      */
     public Node statement() throws Exception {
         if(curToken.type == TokenType.BEGIN){
             return compound_statement();
+        }else if(curToken.type == TokenType.ID && lexer.curChar == '('){
+            return procedureCall_statement();
         }else if(curToken.type == TokenType.ID){
             return assignment_statement();
         }else
@@ -205,17 +211,19 @@ public class Parser {
             }
         }
         while(curToken.type == TokenType.PROCEDURE){
-            eat(TokenType.PROCEDURE);
-            String procName = curToken.value;
-            eat(TokenType.ID);
-            List<ParamNode> params = formalParameters();
-            eat(TokenType.SEMI);
-            BlockNode block = block();
-            ProcedureDeclNode procNode = new ProcedureDeclNode(procName,params,block);
-            declarations.add(procNode);
-            eat(TokenType.SEMI);
+            declarations.add(procedureDeclaration());
         }
         return declarations;
+    }
+    public ProcedureDeclNode procedureDeclaration() throws Exception {
+        eat(TokenType.PROCEDURE);
+        String procName = curToken.value;
+        eat(TokenType.ID);
+        List<ParamNode> params = formalParameters();
+        eat(TokenType.SEMI);
+        BlockNode block = block();
+        eat(TokenType.SEMI);
+        return new ProcedureDeclNode(procName,params,block);
     }
 
     /**
@@ -290,5 +298,26 @@ public class Parser {
         return new ProgramNode(progName,blockNode);
     }
 
+    /**
+     *  procall_statement: ID OPEN_BRACKET empty | expr ( COMMA expr)* CLOSE_BRACKET
+     * @return
+     */
+    private ProcedureCall procedureCall_statement() throws Exception {
+        Token token = curToken;
+        String procName = curToken.value;
+        eat(TokenType.ID);
+        eat(TokenType.OPEN_BRACKET);
+
+        List<Node> params = new ArrayList<>();
+        if(curToken.type != TokenType.CLOSE_BRACKET)
+            params.add(expr());
+        while(curToken.type == TokenType.COMMA){
+            eat(TokenType.COMMA);
+            params.add(expr());
+        }
+        eat(TokenType.CLOSE_BRACKET);
+
+        return new ProcedureCall(procName,params,token);
+    }
 
 }

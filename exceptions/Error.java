@@ -18,7 +18,7 @@ public class Error extends Exception{
     }
 
     public String toString(){
-        return this.getClass() + " - " + token + " : " + msg;
+        return this.getClass() + " - " + errorCode.toString() + ": " +  token + " : " + msg;
     }
 
 }
